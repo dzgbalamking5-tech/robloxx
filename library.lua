@@ -1,5 +1,6 @@
 -- =====================================================
--- PremiumLib.lua v2 - Orion Remix Modern Premium
+-- PremiumLib.lua v3 - Premium UI Library
+-- Modern Glassmorphism + Real ColorPicker + Fixed Dropdown
 -- =====================================================
 
 local TweenService = game:GetService("TweenService")
@@ -10,15 +11,17 @@ local player = Players.LocalPlayer
 local PremiumLib = {}
 PremiumLib.__index = PremiumLib
 
+-- 🎨 Tema
 local theme = {
-    bg = Color3.fromRGB(20,20,26),
-    tab = Color3.fromRGB(30,30,36),
-    section = Color3.fromRGB(26,26,32),
-    accent = Color3.fromRGB(14,118,255),
+    bg = Color3.fromRGB(25,25,32),
+    tab = Color3.fromRGB(35,35,42),
+    section = Color3.fromRGB(30,30,38),
+    accent = Color3.fromRGB(0,170,255),
     text = Color3.fromRGB(240,240,240),
-    shadow = Color3.fromRGB(0,0,0)
+    shadow = Color3.fromRGB(0,0,0),
 }
 
+-- Draggable
 local function makeDraggable(frame)
     local dragging, startPos, startInput
     frame.InputBegan:Connect(function(input)
@@ -42,18 +45,17 @@ local function makeDraggable(frame)
     end)
 end
 
--- 🔥 Notification
+-- 🔔 Notification
 function PremiumLib:Notify(title,msg,dur)
     local gui = player.PlayerGui:FindFirstChild("PremiumLib")
     if not gui then return end
 
     local notif = Instance.new("Frame", gui)
-    notif.Size = UDim2.new(0,250,0,60)
-    notif.Position = UDim2.new(1,-270,1,-100)
+    notif.Size = UDim2.new(0,260,0,70)
+    notif.Position = UDim2.new(1,300,1,-120)
     notif.BackgroundColor3 = theme.tab
     notif.BackgroundTransparency = 0.1
     Instance.new("UICorner", notif).CornerRadius = UDim.new(0,10)
-    notif.ClipsDescendants = true
 
     local lbl = Instance.new("TextLabel", notif)
     lbl.Size = UDim2.new(1,-10,1,-10)
@@ -66,17 +68,15 @@ function PremiumLib:Notify(title,msg,dur)
     lbl.TextYAlignment = Enum.TextYAlignment.Top
     lbl.Text = title.."\n"..msg
 
-    notif.Position = UDim2.new(1,0,1,-100)
-    TweenService:Create(notif,TweenInfo.new(0.4),{Position=UDim2.new(1,-270,1,-100)}):Play()
-
+    TweenService:Create(notif,TweenInfo.new(0.4),{Position=UDim2.new(1,-270,1,-120)}):Play()
     task.delay(dur or 3,function()
-        TweenService:Create(notif,TweenInfo.new(0.4),{Position=UDim2.new(1,0,1,-100)}):Play()
+        TweenService:Create(notif,TweenInfo.new(0.4),{Position=UDim2.new(1,300,1,-120)}):Play()
         task.wait(0.5)
         notif:Destroy()
     end)
 end
 
--- Window
+-- 🪟 Window
 function PremiumLib:MakeWindow(opts)
     opts = opts or {}
     local gui = Instance.new("ScreenGui", player.PlayerGui)
@@ -85,9 +85,10 @@ function PremiumLib:MakeWindow(opts)
     gui.IgnoreGuiInset = true
 
     local Main = Instance.new("Frame", gui)
-    Main.Size = UDim2.new(0,550,0,340)
-    Main.Position = UDim2.new(0.5,-275,0.5,-170)
+    Main.Size = UDim2.new(0,580,0,380)
+    Main.Position = UDim2.new(0.5,-290,0.5,-190)
     Main.BackgroundColor3 = theme.bg
+    Main.BackgroundTransparency = 0.1
     Instance.new("UICorner", Main).CornerRadius = UDim.new(0,12)
     makeDraggable(Main)
 
@@ -100,29 +101,28 @@ function PremiumLib:MakeWindow(opts)
     Title.TextSize = 18
 
     local TabHolder = Instance.new("Frame", Main)
-    TabHolder.Size = UDim2.new(0,140,1,-40)
+    TabHolder.Size = UDim2.new(0,150,1,-40)
     TabHolder.Position = UDim2.new(0,0,0,40)
     TabHolder.BackgroundColor3 = theme.tab
     Instance.new("UICorner", TabHolder).CornerRadius = UDim.new(0,12)
+    local tlist = Instance.new("UIListLayout", TabHolder)
+    tlist.SortOrder = Enum.SortOrder.LayoutOrder
+    tlist.Padding = UDim.new(0,4)
 
     local Content = Instance.new("Frame", Main)
-    Content.Size = UDim2.new(1,-150,1,-50)
-    Content.Position = UDim2.new(0,150,0,40)
+    Content.Size = UDim2.new(1,-160,1,-50)
+    Content.Position = UDim2.new(0,160,0,40)
     Content.BackgroundTransparency = 1
-
-    local UIList = Instance.new("UIListLayout", TabHolder)
-    UIList.SortOrder = Enum.SortOrder.LayoutOrder
-    UIList.Padding = UDim.new(0,4)
 
     local win = {Tabs = {}, Content = Content, TabHolder = TabHolder, Gui = gui}
     setmetatable(win,self)
     return win
 end
 
--- Tab
+-- 📑 Tab
 function PremiumLib:MakeTab(opts)
     local btn = Instance.new("TextButton", self.TabHolder)
-    btn.Size = UDim2.new(1,-10,0,30)
+    btn.Size = UDim2.new(1,-10,0,32)
     btn.BackgroundColor3 = theme.section
     btn.TextColor3 = theme.text
     btn.Text = opts.Name or "Tab"
@@ -140,7 +140,6 @@ function PremiumLib:MakeTab(opts)
     layout.Padding = UDim.new(0,6)
     Instance.new("UIPadding", page).PaddingTop = UDim.new(0,6)
 
-    -- Tab pertama auto aktif
     if #self.Tabs == 0 then
         page.Visible = true
     end
@@ -164,17 +163,6 @@ function PremiumLib:MakeTab(opts)
         s.Font = Enum.Font.GothamBold
         s.TextColor3 = theme.text
         s.TextSize = 14
-    end
-
-    function tab:AddLabel(txt)
-        local l = Instance.new("TextLabel", page)
-        l.Size = UDim2.new(1,-10,0,22)
-        l.BackgroundTransparency = 1
-        l.Text = txt
-        l.TextColor3 = theme.text
-        l.Font = Enum.Font.Gotham
-        l.TextSize = 14
-        return l
     end
 
     function tab:AddButton(txt,callback)
@@ -208,6 +196,7 @@ function PremiumLib:MakeTab(opts)
         return t
     end
 
+    -- 📝 Textbox
     function tab:AddTextbox(txt,default,callback)
         local box = Instance.new("TextBox", page)
         box.Size = UDim2.new(1,-10,0,32)
@@ -224,78 +213,115 @@ function PremiumLib:MakeTab(opts)
         return box
     end
 
+    -- 🎨 Real Color Picker
     function tab:AddColorPicker(txt,default,callback)
+        local frame = Instance.new("Frame", page)
+        frame.Size = UDim2.new(1,-10,0,180)
+        frame.BackgroundColor3 = theme.section
+        Instance.new("UICorner", frame).CornerRadius = UDim.new(0,8)
+
+        local lbl = Instance.new("TextLabel", frame)
+        lbl.Size = UDim2.new(1,0,0,20)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = txt
+        lbl.TextColor3 = theme.text
+        lbl.Font = Enum.Font.GothamBold
+        lbl.TextSize = 14
+
+        -- Preview
+        local preview = Instance.new("Frame", frame)
+        preview.Size = UDim2.new(0,50,0,50)
+        preview.Position = UDim2.new(0,10,0,30)
+        preview.BackgroundColor3 = default or Color3.new(1,1,1)
+        Instance.new("UICorner", preview).CornerRadius = UDim.new(0,6)
+
+        -- HEX box
+        local hex = Instance.new("TextBox", frame)
+        hex.Size = UDim2.new(0,100,0,24)
+        hex.Position = UDim2.new(0,70,0,35)
+        hex.BackgroundColor3 = theme.bg
+        hex.Text = string.format("#%02X%02X%02X",
+            math.floor(preview.BackgroundColor3.R*255),
+            math.floor(preview.BackgroundColor3.G*255),
+            math.floor(preview.BackgroundColor3.B*255))
+        hex.TextColor3 = theme.text
+        hex.Font = Enum.Font.Gotham
+        hex.TextSize = 14
+        Instance.new("UICorner", hex).CornerRadius = UDim.new(0,6)
+
+        -- Hue bar
+        local hue = Instance.new("Frame", frame)
+        hue.Size = UDim2.new(0,20,1,-40)
+        hue.Position = UDim2.new(1,-30,0,30)
+        local grad = Instance.new("UIGradient", hue)
+        grad.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0,Color3.fromHSV(0,1,1)),
+            ColorSequenceKeypoint.new(0.17,Color3.fromHSV(0.17,1,1)),
+            ColorSequenceKeypoint.new(0.33,Color3.fromHSV(0.33,1,1)),
+            ColorSequenceKeypoint.new(0.5,Color3.fromHSV(0.5,1,1)),
+            ColorSequenceKeypoint.new(0.67,Color3.fromHSV(0.67,1,1)),
+            ColorSequenceKeypoint.new(0.83,Color3.fromHSV(0.83,1,1)),
+            ColorSequenceKeypoint.new(1,Color3.fromHSV(1,1,1))
+        }
+
+        -- Simple: klik hue → ganti warna preview
+        hue.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                local relY = (input.Position.Y - hue.AbsolutePosition.Y) / hue.AbsoluteSize.Y
+                local c = Color3.fromHSV(relY,1,1)
+                preview.BackgroundColor3 = c
+                hex.Text = string.format("#%02X%02X%02X",
+                    math.floor(c.R*255),math.floor(c.G*255),math.floor(c.B*255))
+                callback(c)
+            end
+        end)
+    end
+
+    -- ⬇️ Dropdown fix
+    function tab:AddDropdown(txt,list,callback)
         local f = Instance.new("Frame", page)
         f.Size = UDim2.new(1,-10,0,32)
         f.BackgroundColor3 = theme.section
         Instance.new("UICorner", f).CornerRadius = UDim.new(0,8)
 
-        local lbl = Instance.new("TextLabel", f)
-        lbl.Size = UDim2.new(0.6,0,1,0)
-        lbl.BackgroundTransparency = 1
-        lbl.Text = txt
-        lbl.TextColor3 = theme.text
-        lbl.Font = Enum.Font.Gotham
-        lbl.TextSize = 14
-
         local btn = Instance.new("TextButton", f)
-        btn.Size = UDim2.new(0.4,-4,1,-4)
-        btn.Position = UDim2.new(0.6,2,0,2)
-        btn.BackgroundColor3 = default or Color3.fromRGB(0,170,255)
-        btn.Text = ""
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+        btn.Size = UDim2.new(1,0,1,0)
+        btn.BackgroundTransparency = 1
+        btn.Text = txt.." ▼"
+        btn.TextColor3 = theme.text
+        btn.Font = Enum.Font.GothamBold
+        btn.TextSize = 14
+
+        local dropFrame = Instance.new("ScrollingFrame", f)
+        dropFrame.Size = UDim2.new(1,0,0,0)
+        dropFrame.Position = UDim2.new(0,0,1,0)
+        dropFrame.CanvasSize = UDim2.new(0,0,0,0)
+        dropFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        dropFrame.ScrollBarThickness = 4
+        dropFrame.BackgroundColor3 = theme.bg
+        dropFrame.Visible = false
+        local dlist = Instance.new("UIListLayout", dropFrame)
+        dlist.Padding = UDim.new(0,2)
+
+        for _,item in ipairs(list) do
+            local it = Instance.new("TextButton", dropFrame)
+            it.Size = UDim2.new(1,0,0,28)
+            it.BackgroundColor3 = theme.section
+            it.Text = item
+            it.TextColor3 = theme.text
+            it.Font = Enum.Font.Gotham
+            it.TextSize = 14
+            Instance.new("UICorner", it).CornerRadius = UDim.new(0,6)
+            it.MouseButton1Click:Connect(function()
+                btn.Text = txt..": "..item.." ▼"
+                dropFrame.Visible = false
+                callback(item)
+            end)
+        end
 
         btn.MouseButton1Click:Connect(function()
-            local new = Color3.fromRGB(math.random(0,255),math.random(0,255),math.random(0,255))
-            btn.BackgroundColor3 = new
-            callback(new)
-        end)
-    end
-
-    function tab:AddKeybind(txt,key,callback)
-        local b = Instance.new("TextButton", page)
-        b.Size = UDim2.new(1,-10,0,32)
-        b.BackgroundColor3 = theme.section
-        b.TextColor3 = theme.text
-        b.Text = txt.." ["..key.Name.."]"
-        b.Font = Enum.Font.GothamBold
-        b.TextSize = 14
-        Instance.new("UICorner", b).CornerRadius = UDim.new(0,8)
-
-        UserInputService.InputBegan:Connect(function(input,gpe)
-            if not gpe and input.KeyCode == key then
-                callback()
-            end
-        end)
-    end
-
-    function tab:AddSlider(txt,opts,callback)
-        local f = Instance.new("Frame", page)
-        f.Size = UDim2.new(1,-10,0,50)
-        f.BackgroundColor3 = theme.section
-        Instance.new("UICorner", f).CornerRadius = UDim.new(0,8)
-
-        local lbl = Instance.new("TextLabel", f)
-        lbl.Size = UDim2.new(1,-10,0,20)
-        lbl.Position = UDim2.new(0,5,0,0)
-        lbl.BackgroundTransparency = 1
-        lbl.Text = txt..": "..opts.default
-        lbl.TextColor3 = theme.text
-        lbl.Font = Enum.Font.Gotham
-        lbl.TextSize = 14
-
-        local slider = Instance.new("TextButton", f)
-        slider.Size = UDim2.new(1,-20,0,20)
-        slider.Position = UDim2.new(0,10,0,25)
-        slider.BackgroundColor3 = theme.accent
-        Instance.new("UICorner", slider).CornerRadius = UDim.new(0,6)
-        slider.Text = ""
-
-        local val = opts.default
-        slider.MouseButton1Click:Connect(function()
-            val = (val+1 > opts.max) and opts.min or val+1
-            lbl.Text = txt..": "..val
-            callback(val)
+            dropFrame.Visible = not dropFrame.Visible
+            dropFrame.Size = dropFrame.Visible and UDim2.new(1,0,0,150) or UDim2.new(1,0,0,0)
         end)
     end
 
