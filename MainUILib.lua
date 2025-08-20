@@ -156,3 +156,5 @@ function MainUI:AddToggle(page,text,default,callback)
         if callback then callback(state) end
     end)
 end
+
+return MainUI
