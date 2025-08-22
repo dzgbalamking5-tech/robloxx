@@ -13,7 +13,7 @@ function UILibrary:CreateWindow(options)
     local title = options.Title or "Premium Hub"
     local subtitle = options.Subtitle or ""
     local size = options.Size or UDim2.new(0, 600, 0, 400)
-    local position = options.Position or UDim2.new(0.5, -300, 0.5, -200)
+    local position = options.Position or UDim2.new(0.5, 0, 0.5, 0) -- ✅ tengah otomatis
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "PremiumMainUI"
@@ -25,7 +25,7 @@ function UILibrary:CreateWindow(options)
     MainFrame.Name = "MainFrame"
     MainFrame.Size = size
     MainFrame.Position = position
-    MainFrame.AnchorPoint = Vector2.new(0.5,0.5)
+    MainFrame.AnchorPoint = Vector2.new(0.5,0.5) -- ✅ pusat di tengah
     MainFrame.BackgroundColor3 = Color3.fromRGB(20,20,25)
     MainFrame.BorderSizePixel = 0
     MainFrame.Parent = ScreenGui
